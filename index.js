@@ -7,8 +7,8 @@
  *
  * These covers most use cases for file data storage.
  */
-const PouchDB = require("pouchdb").default;
-const PouchFind = require("pouchdb-find").default;
+const PouchDB = require("pouchdb");
+const PouchFind = require("pouchdb-find");
 
 const fs = require("fs");
 const path = require("path");
