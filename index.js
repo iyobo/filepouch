@@ -7,8 +7,8 @@
  *
  * These covers most use cases for file data storage.
  */
-import PouchDB from "pouchdb";
-import PouchFind from "pouchdb-find";
+const PouchDB = require("pouchdb").default;
+const PouchFind = require("pouchdb-find").default;
 
 const fs = require("fs");
 const path = require("path");
@@ -24,11 +24,20 @@ const _checkInit = () => {
         throw new Error('FilePouch not initialized. Please run initializeData(...)');
 }
 
+let db = null;
 
-export const initializeData = async (opts) => {
+
+const initializeData = exports.initializeData = async (opts) => {
     console.log("Initializing DB...");
 
-    const {storageFolder, databaseFileName='db', auto_compaction=true, indexes} = opts;
+    const {
+        storageFolder,
+        databaseFileName = 'db',
+        pouchOpts = {auto_compaction: true},
+        indexes
+    } = opts;
+
+    if(!storageFolder) throw new Error('opts.storageFolder is required by filepouch')
 
     //Create storage folder if full directory path does not exist
     if (!fs.existsSync(storageFolder)) {
@@ -36,7 +45,8 @@ export const initializeData = async (opts) => {
         fs.mkdirSync(storageFolder);
     }
 
-    export const db = new PouchDB(path.join(storageFolder, databaseFileName), {auto_compaction});
+
+    db = new PouchDB(path.join(storageFolder, databaseFileName), pouchOpts);
 
 
     // ensure  inbuilt indexes
@@ -53,10 +63,10 @@ export const initializeData = async (opts) => {
     });
 
     //ensure custom indexes
-    if(indexes){
-        if(!Array.isArray(indexes)) throw new Error('filepuch: initializeData: opts.indexes must be an array of pouchdb index field arrays')
+    if (indexes) {
+        if (!Array.isArray(indexes)) throw new Error('filepuch: initializeData: opts.indexes must be an array of pouchdb index field arrays')
 
-        indexes.forEach(async(it)=>{
+        indexes.forEach(async (it) => {
             await db.createIndex({
                 index: {fields: it}
             });
@@ -66,7 +76,7 @@ export const initializeData = async (opts) => {
     initialized = true;
 };
 
-export const upsert = async (entity) => {
+const upsert = exports.upsert = async (entity) => {
     _checkInit();
 
     let existing = await findOne({_id: entity._id});//Do we need to know this???
@@ -84,12 +94,12 @@ export const upsert = async (entity) => {
     return doc;
 };
 
-export const setConfig = async (name, value) => {
+const setConfig = exports.setConfig = async (name, value) => {
     _checkInit();
     return await upsert({_id: name, value});
 };
 
-export const getConfig = async (name) => {
+const getConfig = exports.getConfig = async (name) => {
     _checkInit();
     return await findById(name);
 };
@@ -99,7 +109,7 @@ export const getConfig = async (name) => {
  * @param id
  * @returns {Promise<void>}
  */
-export const findById = async (id) => {
+const findById = exports.findById = async (id) => {
     _checkInit();
     const res = await findOne({_id: id});
     return res;
@@ -111,7 +121,7 @@ export const findById = async (id) => {
  * @param sort - <Array> array of fields to sort by
  * @returns {Promise<*>}
  */
-export const find = async (where, sort) => {
+const find = exports.find = async (where, sort) => {
     _checkInit();
     const {docs} = await db.find({
         selector: where
@@ -127,7 +137,7 @@ export const find = async (where, sort) => {
  * @param sort <Array>
  * @returns {Promise<null>}
  */
-export const findOne = async (where, sort) => {
+const findOne = exports.findOne = async (where, sort) => {
     _checkInit();
     const list = await find(where, sort);
     return list.length > 0 ? list[0] : null;
@@ -138,7 +148,7 @@ export const findOne = async (where, sort) => {
  * @param entityId
  * @returns {Promise<void>}
  */
-export const remove = async (entityId) => {
+const remove = exports.remove = async (entityId) => {
     _checkInit();
     const doc = await findById(entityId);
     if (LOGGING) console.log("PouchDB remove", doc);

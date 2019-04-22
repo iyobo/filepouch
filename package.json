@@ -4,7 +4,8 @@
   "description": "A utility module for local file-based persistence. Useful when using remote.require in electron apps. Powered by PouchDB/LevelDB.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm rebuild"
   },
   "author": "Iyobo Eki",
   "license": "ISC",
