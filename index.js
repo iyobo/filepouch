@@ -14,7 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const LOGGING = false;
+let LOGGING = false;
 let initialized = false;
 
 PouchDB.plugin(PouchFind);
@@ -32,12 +32,15 @@ const initializeData = exports.initializeData = async (opts) => {
 
     const {
         storageFolder,
+        verbose,
         databaseFileName = 'db',
         pouchOpts = {auto_compaction: true},
         indexes
     } = opts;
 
-    if(!storageFolder) throw new Error('opts.storageFolder is required by filepouch')
+    if (verbose) LOGGING = true;
+
+    if (!storageFolder) throw new Error('opts.storageFolder is required by filepouch')
 
     //Create storage folder if full directory path does not exist
     if (!fs.existsSync(storageFolder)) {
