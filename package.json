@@ -1,6 +1,6 @@
 {
   "name": "filepouch",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A utility module for local file-based persistence. Useful when using remote.require in electron apps. Powered by PouchDB/LevelDB.",
   "main": "index.js",
   "scripts": {
