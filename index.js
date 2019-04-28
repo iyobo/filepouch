@@ -93,6 +93,8 @@ const upsert = exports.upsert = async (entity) => {
 
     entity.timestamp = Date.now();
 
+    console.log(entity);
+
     let doc = await db.put(entity, {force: true});
     return doc;
 };
